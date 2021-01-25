@@ -6,10 +6,10 @@ def karatsuba(x: str, y: str) -> int:
         return int(x) * int(y)
 
     # 0. find a,b,c,d
-    ndiv2 = max(len(x), len(y)) // 2
+    ndiv2 = min(len(x), len(y)) // 2
 
     a, b = x[:-ndiv2], x[-ndiv2:]
-    c, d = y[:-ndiv2], x[-ndiv2:]
+    c, d = y[:-ndiv2], y[-ndiv2:]
 
     # 1. multiply ac
     ac = karatsuba(a, c)
@@ -21,7 +21,7 @@ def karatsuba(x: str, y: str) -> int:
     adbc = abcd - ac - bd
     # 4. return 10^n ac + 10^(n/2)(ad+bc) + bd
 
-    return 10 ** (ndiv2 * 2) * ac + 10 ** ndiv2 * adbc + bd
+    return 10 ** (ndiv2 * 2) * ac + (10 ** ndiv2) * adbc + bd
 
 
 if __name__ == "__main__":
