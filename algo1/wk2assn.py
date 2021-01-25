@@ -1,6 +1,20 @@
 import array
 
 
+def count_split_inv(x: array.ArrayType) -> tuple:
+    raise NotImplementedError
+
+
+def sort_and_count(x: array.ArrayType) -> tuple:
+    n = len(x)
+    if n == 1:
+        return 0
+    b, x = sort_and_count(x[: n // 2])
+    c, y = sort_and_count(x[n // 2 :])
+    d, z = count_split_inv(a)
+    return sum((x, y, z))
+
+
 def num_inversions(x) -> int:
     x = array.array("b", x)
     if len(x) < 2:
