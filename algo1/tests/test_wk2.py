@@ -6,6 +6,7 @@ from algo1.wk2assn import num_inversions
 @pytest.mark.parametrize(
     "x,n_true",
     [
+        ((1, 2, 4, 3), 1),
         ((1, 2, 3, 5, 4, 6), 1),
         ((1, 2, 5, 3, 4, 6), 2),
         ((1, 3, 5, 2, 4, 6), 3),
