@@ -1,65 +1,70 @@
 import logging
 import array
+from typing import Tuple, AnyStr
+from itertools import repeat
+
 
 LOGGER = logging.getLogger(__name__)
 FORMAT = "[%(filename)s:%(lineno)s - %(funcName)25s() ] %(message)s"
 logging.basicConfig(format=FORMAT)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.INFO)
 
 
-def merge_and_count_splits(arr1, arr2):
-    LOGGER.debug(f"arr1 : {arr1}")
-    LOGGER.debug(f"arr2 : {arr2}")
-    arr1_l = len(arr1)
-    arr2_l = len(arr2)
-    n = sum((arr1_l, arr2_l))
-    i, j, invs = 0, 0, 0
-    arr_sorted = array.array("I", [0] * n)
+def sort_and_count(arr: array.ArrayType, n: int) -> Tuple[array.ArrayType, int]:
+    LOGGER.debug(f"N: {n:3d}   A: {arr} ")
+    if n == 1:
+        return arr, 0
 
-    for k in range(n):
-        # end case 1: no more items in arr1, append all remaining items in arr2
-        if i >= arr1_l:
-            arr_sorted[k:] = arr2[j:]
+    arr_l = arr[: n // 2]
+    arr_r = arr[n // 2 :]
+    b, x = sort_and_count(arr_l, n // 2)
+    c, y = sort_and_count(arr_r, n - n // 2)
+    d, z = merge_and_count_split(b, c)
+    LOGGER.debug(f"X={x:2d} | Y={y:2d} | Z={z:2d}")
+    return d, (x + y + z)
+
+
+def merge_and_count_split(
+    b: array.ArrayType, c: array.ArrayType
+) -> Tuple[array.ArrayType, int]:
+    d = array.array("I", repeat(0, len(b) + len(c)))
+    LOGGER.debug(f"Initialized D with length {len(d)}")
+    splits = 0
+    i, j = 0, 0
+    for k in range(len(d)):
+        # edge case 1: empty b, add rest of cs and quit
+        # No inverted elements remain
+        if i >= len(b):
+            LOGGER.debug(f"Edge case 1 for k={k}: rest of c: {c[j:]}")
+            d[k:] = c[j:]
             break
-        # end case 2: no more items in arr2
-        if j >= arr2_l:
-            arr_sorted[k:] = arr1[i:]
-            invs += n - i
+        # edge case 2: empty c, add rest of bs and ADD number of bs to split
+        # All remaining elements of b are inverted with ALL elements of c
+        elif j >= len(c):
+            LOGGER.debug(f"Edge case 2 for k={k}: rest of b: {b[i:]}")
+            d[k:] = b[i:]
             break
-
-        l, r = arr1[i], arr2[j]
-        if l < r:
-            arr_sorted[k] = l
+        elif b[i] < c[j]:
+            # everything normal. Increment i.
+            d[k] = b[i]
             i += 1
-        else:
-            arr_sorted[k] = r
+        elif b[i] > c[j]:
+            # inversion! c[j] is inverted with all elements left in b 
+            LOGGER.debug(f"Found inversion: B[{i}]={b[i]} > C[{j}]={c[j]}")
+            d[k] = c[j]
+            splits += len(b[i:]) 
             j += 1
-            invs += 1
-    return arr_sorted, invs
+
+    assert len(d) == len(b) + len(c)
+    LOGGER.debug(f"Returning splits={splits}, D: {d}")
+    return d, splits
 
 
-def count_split_inv(x: array.ArrayType) -> tuple:
-    raise NotImplementedError
-
-
-def sort_and_count(x: array.ArrayType) -> tuple:
-    LOGGER.debug(f"x    : {type(x)} --> {x}")
-    n = len(x)
-    if n <= 1:
-        return x, 0
-    xl = x[: n // 2]
-    xr = x[n // 2 :]
-    b, x = sort_and_count(xl)
-    c, y = sort_and_count(xr)
-    d, z = merge_and_count_splits(b, c)
-    return d, sum((x, y, z))
-
-
-def num_inversions(x) -> int:
-    x = array.array("b", x)
-    if len(x) < 2:
-        return 0
-    return None
+def num_inversions(arr: array.ArrayType) -> Tuple[array.ArrayType, int]:
+    if not isinstance(arr, array.ArrayType):
+        arr = array.array("I", arr)
+    arr_sorted, n_invs = sort_and_count(arr, len(arr))
+    return n_invs
 
 
 if __name__ == "__main__":
@@ -82,4 +87,7 @@ if __name__ == "__main__":
 
     LOGGER.info(f"Found {len(numbers)} numbers")
 
-    LOGGER.info(sort_and_count(x=array.array("I", numbers)))
+    arr = array.array("I", map(int, numbers))
+
+    LOGGER.info(num_inversions(arr))
+    LOGGER.debug(str(arr) + " <-- original")
