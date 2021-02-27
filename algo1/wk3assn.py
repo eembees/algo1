@@ -107,10 +107,15 @@ def get_piv_idx_med(arr, start, stop):
 
     if idx_mid in (start, stop):
         return idx_mid
-    _t = arr[start], arr[stop], arr[idx_mid]
-    for idx in start, stop, idx_mid:
-        if arr[idx] < max(_t) and arr[idx] > min(_t):
-            return idx
+
+    median_array = sorted([ (arr[start], start), (arr[idx_mid], idx_mid), (arr[stop], stop)])
+
+    return median_array[1][1]
+
+    # _t = arr[start], arr[stop], arr[idx_mid]
+    # for idx in start, stop, idx_mid:
+    #     if arr[idx] < max(_t) and arr[idx] > min(_t):
+    #         return idx
 
 
 def quicksort_and_count_med(arr: array.ArrayType, start: int, stop: int) -> int:
@@ -148,7 +153,8 @@ if __name__ == "__main__":
     from ast import literal_eval
     import argparse
     import sys
-    sys.setrecursionlimit(10000) # TODO: comment away ifneed
+    from copy import deepcopy
+    sys.setrecursionlimit(10000000) # TODO: comment away ifneed
 
     LOGGER.critical("Recursion limit:  " + str(sys.getrecursionlimit()))
 
@@ -171,14 +177,12 @@ if __name__ == "__main__":
 
     if LOGGER.isEnabledFor(logging.DEBUG):
         LOGGER.debug(str(arr) + " <-- original")
-    # ans_first = quicksort_and_count_first(arr, start=0, stop=len(arr) - 1)
-    ans_last = quicksort_and_count_last(arr, start=0, stop=len(arr) - 1)
-    ans_med = quicksort_and_count_med(arr, start=0, stop=len(arr) - 1)
+    ans_first = quicksort_and_count_first(deepcopy(arr), start=0, stop=len(arr) - 1)
+    ans_last = quicksort_and_count_last(deepcopy(arr), start=0, stop=len(arr) - 1)
+    ans_med = quicksort_and_count_med(deepcopy(arr), start=0, stop=len(arr) - 1)
 
     LOGGER.critical("ANSWER:")
-    # LOGGER.critical(f"FIRST : {ans_first}")
+    LOGGER.critical(f"FIRST : {ans_first}")
     LOGGER.critical(f"LAST  : {ans_last}")
     LOGGER.critical(f"MEDIAN: {ans_med}")
 
-    if LOGGER.isEnabledFor(logging.DEBUG):
-        LOGGER.debug(str(arr) + " <-- sorted")
