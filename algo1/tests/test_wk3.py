@@ -7,7 +7,11 @@ import pytest
 from operator import itemgetter
 
 import context
-from algo1.wk3assn import quicksort_and_count_first, quicksort_and_count_last,quicksort_and_count_med
+from algo1.wk3assn import (
+    quicksort_and_count_first,
+    quicksort_and_count_last,
+    quicksort_and_count_med,
+)
 
 
 MAX_LEN = int(os.getenv("MAX_TEST_LEN", "100"))
@@ -57,10 +61,9 @@ def test_wk3_single(quicksort_f, path, answer):
     return answer == pred
 
 
-
 def test_wk3_first(cases):
     results = [
-        test_wk3_single(quicksort_and_count_first,_p, _ans[0])
+        test_wk3_single(quicksort_and_count_first, _p, _ans[0])
         for _p, _ans in map(
             itemgetter("path", "answers"),
             filter(
@@ -69,7 +72,7 @@ def test_wk3_first(cases):
             ),
         )
     ]
-    LOGGER.info(
+    LOGGER.critical(
         f"PASS RATE: {sum(results): <5d}/{len(results): <5d} = {float(sum(results))/len(results):.0%}"
     )
 
@@ -85,9 +88,10 @@ def test_wk3_last(cases):
             ),
         )
     ]
-    LOGGER.info(
+    LOGGER.critical(
         f"PASS RATE: {sum(results): <5d}/{len(results): <5d} = {float(sum(results))/len(results):.0%}"
     )
+
 
 def test_wk3_med(cases):
     results = [
@@ -100,7 +104,7 @@ def test_wk3_med(cases):
             ),
         )
     ]
-    LOGGER.info(
+    LOGGER.critical(
         f"PASS RATE: {sum(results): <5d}/{len(results): <5d} = {float(sum(results))/len(results):.0%}"
     )
 

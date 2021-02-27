@@ -73,8 +73,8 @@ def quicksort_and_count_last(arr: array.ArrayType, start: int, stop: int) -> int
         LOGGER.debug(
             f"{arr} \t| Quicksort: arr[{start:>2}:{stop+1: <2}] --> \t| {list(arr[start:stop+1])}"
         )
-    if stop + 1 - start <= 1:
-        return stop + 1 - start
+    if stop - start < 1:
+        return 0
 
     swap(arr, start, stop)
     m_p, i_p = partition(arr, start, stop)
@@ -92,10 +92,17 @@ def quicksort_and_count_last(arr: array.ArrayType, start: int, stop: int) -> int
 
 
 def get_piv_idx_med(arr, start, stop):
-    idx_mid = start + round((stop - start) / 2 )
+    # idx_mid = start + round((stop - start) / 2 )
+    if stop - start % 2 == 1:  # even length array,
+        # LOGGER.debug("Even length array")
+        idx_mid = int(start + (stop - start + 1) / 2)
+    else:  # odd length array
+        # LOGGER.debug("Odd  length array")
+        idx_mid = int(start + (stop - start) / 2)
+
     if LOGGER.isEnabledFor(logging.DEBUG):
         LOGGER.debug(
-            f"{arr} \t| Pivot cands: 1: arr[{start}, {idx_mid}, {stop}] = {arr[start]}, {arr[idx_mid]}, {arr[stop]} "
+            f"{arr} \t| Pivot cands: 1: arr[{start}, {idx_mid}, {stop}] "  # = {arr[start]}, {arr[idx_mid]}, {arr[stop]} "
         )
 
     if idx_mid in (start, stop):
@@ -130,7 +137,9 @@ def quicksort_and_count_med(arr: array.ArrayType, start: int, stop: int) -> int:
     m_1 = quicksort_and_count_med(arr, start=start, stop=i_p - 1)
     m_2 = quicksort_and_count_med(arr, start=i_p + 1, stop=stop)
     if LOGGER.isEnabledFor(logging.DEBUG):
-        LOGGER.debug(f"{arr} \t| Quicksort: arr[{start:>2}:{stop+1: <2}] -->  \t| m_p + m_1 + m_2 = {m_p}+{m_1}+{m_2}={m_p + m_1 + m_2}")
+        LOGGER.debug(
+            f"{arr} \t| Quicksort: arr[{start:>2}:{stop+1: <2}] -->  \t| m_p + m_1 + m_2 = {m_p}+{m_1}+{m_2}={m_p + m_1 + m_2}"
+        )
     return m_p + m_1 + m_2
 
 
@@ -138,6 +147,11 @@ if __name__ == "__main__":
     from pathlib import Path
     from ast import literal_eval
     import argparse
+    import sys
+    sys.setrecursionlimit(10000) # TODO: comment away ifneed
+
+    LOGGER.critical("Recursion limit:  " + str(sys.getrecursionlimit()))
+
 
     parser = argparse.ArgumentParser(
         prog="Number of comparisons in quicksort",
@@ -157,7 +171,14 @@ if __name__ == "__main__":
 
     if LOGGER.isEnabledFor(logging.DEBUG):
         LOGGER.debug(str(arr) + " <-- original")
-    ans = quicksort_and_count_first(arr, start=0, stop=len(arr) - 1)
-    LOGGER.info(ans)
+    # ans_first = quicksort_and_count_first(arr, start=0, stop=len(arr) - 1)
+    ans_last = quicksort_and_count_last(arr, start=0, stop=len(arr) - 1)
+    ans_med = quicksort_and_count_med(arr, start=0, stop=len(arr) - 1)
+
+    LOGGER.critical("ANSWER:")
+    # LOGGER.critical(f"FIRST : {ans_first}")
+    LOGGER.critical(f"LAST  : {ans_last}")
+    LOGGER.critical(f"MEDIAN: {ans_med}")
+
     if LOGGER.isEnabledFor(logging.DEBUG):
         LOGGER.debug(str(arr) + " <-- sorted")
